@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ロマ子様投票漏れ防止チェック表</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@700&family=Orbitron:wght@900&display=swap');
+
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #1a1a1a;
+            color: #f0f0f0;
+            background-image: radial-gradient(circle, #4a1a1a, #1a1a1a);
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: #2c2c2c;
+            padding: 25px;
+            border-radius: 10px;
+            border: 1px solid #ff0000;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+        }
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            text-align: center;
+            color: #ffdd57; /* Gold */
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px #000, 0 0 10px #ff0000;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #ccc;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+        .user-form {
+            display: flex;
+            margin-bottom: 25px;
+        }
+        .user-form input {
+            flex-grow: 1;
+            padding: 12px;
+            border: 1px solid #555;
+            border-radius: 5px;
+            background-color: #333;
+            color: #fff;
+            font-size: 1em;
+        }
+        .user-form button {
+            padding: 12px 20px;
+            border: none;
+            background-color: #c00;
+            color: white;
+            border-radius: 5px;
+            margin-left: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        .user-form button:hover {
+            background-color: #ff0000;
+        }
+        .link-container {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .link-container a {
+            display: inline-block;
+            padding: 12px 25px;
+            background-color: #ffdd57;
+            color: #1a1a1a;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 5px;
+            border: 2px solid #c00;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        .link-container a:hover {
+            background-color: #fff;
+            color: #c00;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px; /* Prevent table from becoming too narrow */
+        }
+        .table-container {
+            overflow-x: auto;
+            margin-top: 20px;
+            border: 1px solid #555;
+            border-radius: 5px;
+        }
+        th, td {
+            border: 1px solid #555;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #444;
+            color: #ffdd57;
+            font-size: 0.9em;
+        }
+        td:first-child {
+            font-weight: bold;
+            color: #ffc107;
+        }
+        input[type="checkbox"] {
+            width: 22px;
+            height: 22px;
+            cursor: pointer;
+            accent-color: #ff0000;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>👑 ロマ子様投票漏れ防止チェック表 👑</h1>
+        <p class="subtitle">毎日投票して、ロマ子様を応援するブヒ！ (7月2日〜7月21日)</p>
+        <div class="link-container">
+            <a href="https://ec.v-tamp.com/events/vtamp_expo_2025_1/rank_bord/romaco" target="_blank" rel="noopener noreferrer">公式ランキングボードで戦況を確認せよ</a>
+        </div>
+        <div class="user-form">
+            <input type="text" id="new-user-name" placeholder="貴様の名前を刻め...">
+            <button onclick="addUser()">参戦</button>
+        </div>
+        <div class="table-container">
+            <table id="vote-table">
+            <thead>
+                <tr id="table-header">
+                    <th>下僕</th>
+                </tr>
+            </thead>
+            <tbody id="table-body">
+            </tbody>
+        </table>
+        </div>
+    </div>
+
+    <script>
+        const startDate = new Date('2025-07-02');
+        const endDate = new Date('2025-07-21');
+        const dates = [];
+        let currentDate = new Date(startDate);
+
+        while (currentDate <= endDate) {
+            dates.push(currentDate.toISOString().split('T')[0]);
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+
+        let users = JSON.parse(localStorage.getItem('romako_users')) || [];
+        let votes = JSON.parse(localStorage.getItem('romako_votes')) || {};
+
+        function saveState() {
+            localStorage.setItem('romako_users', JSON.stringify(users));
+            localStorage.setItem('romako_votes', JSON.stringify(votes));
+        }
+
+        function renderTable() {
+            const tableHeader = document.getElementById('table-header');
+            const tableBody = document.getElementById('table-body');
+
+            tableHeader.innerHTML = '<th>下僕</th>';
+            tableBody.innerHTML = '';
+
+            dates.forEach(date => {
+                const th = document.createElement('th');
+                th.textContent = date.substring(5).replace('-', '/'); // MM/DD
+                tableHeader.appendChild(th);
+            });
+
+            users.forEach(user => {
+                const tr = document.createElement('tr');
+                const tdName = document.createElement('td');
+                tdName.textContent = user.name;
+                tr.appendChild(tdName);
+
+                dates.forEach(date => {
+                    const td = document.createElement('td');
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.checked = votes[date] && votes[date].includes(user.id);
+                    checkbox.onchange = () => toggleVote(user.id, date);
+                    td.appendChild(checkbox);
+                    tr.appendChild(td);
+                });
+                tableBody.appendChild(tr);
+            });
+        }
+
+        function addUser() {
+            const input = document.getElementById('new-user-name');
+            const name = input.value.trim();
+            if (name && !users.some(u => u.name === name)) {
+                const newUser = { id: Date.now(), name: name };
+                users.push(newUser);
+                input.value = '';
+                saveState();
+                renderTable();
+            } else if (name) {
+                alert('その名は既に刻まれている。');
+            }
+        }
+
+        function toggleVote(userId, date) {
+            if (!votes[date]) {
+                votes[date] = [];
+            }
+            const userIndex = votes[date].indexOf(userId);
+            if (userIndex > -1) {
+                votes[date].splice(userIndex, 1);
+            } else {
+                votes[date].push(userId);
+            }
+            saveState();
+        }
+
+        renderTable();
+    </script>
+
+</body>
+</html>

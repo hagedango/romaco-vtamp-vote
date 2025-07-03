@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>さあ、投票なさい</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1>さあ、どの日がいいか選びなさい！</h1>
+        <div class="vote-section">
+            <div class="date-picker">
+                <label for="vote-date">投票日を選べ</label>
+                <input type="date" id="vote-date">
+            </div>
+            <div id="options-container">
+                <!-- 候補者は script.js によってここに読み込まれるわ -->
+            </div>
+            <button id="vote-button">この日に投じる</button>
+        </div>
+        <div id="result-message"></div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
